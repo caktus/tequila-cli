@@ -20,3 +20,9 @@ def play(environment, playbook):
     inventory = os.path.join(environment_path, 'inventory')
 
     subprocess.call(['ansible-playbook', '-i', inventory, playbook_path])
+
+
+@cli.command()
+def install_roles():
+    requirements_path = os.path.join('deployment', 'requirements.yml')
+    subprocess.call(['ansible-galaxy', 'install', '-i', '-r', requirements_path])
