@@ -9,7 +9,7 @@ def cli():
     pass
 
 
-@cli.command()
+@cli.command(short_help="Run a playbook for a given environment.")
 @click.argument('environment')
 @click.argument('playbook', default='site')
 def play(environment, playbook):
@@ -22,7 +22,7 @@ def play(environment, playbook):
     subprocess.call(['ansible-playbook', '-i', inventory, playbook_path])
 
 
-@cli.command()
+@cli.command(short_help="Install the Ansible roles in the requirements file.")
 def install_roles():
     requirements_path = os.path.join('deployment', 'requirements.yml')
     subprocess.call(['ansible-galaxy', 'install', '-i', '-r', requirements_path])
