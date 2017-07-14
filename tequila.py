@@ -15,34 +15,57 @@ def cli():
     pass
 
 
-def print_envs_playbooks(ctx, param, value):
-    if not value or ctx.resilient_parsing:
-        return
+class PlayCommand(click.Command):
+    def get_environments(self, ctx):
+        environments_path = os.path.join('deployment', 'environments')
+        return list(sorted(os.listdir(environments_path)))
 
-    environments_path = os.path.join('deployment', 'environments')
-    playbooks_path = os.path.join('deployment', 'playbooks')
+    def get_playbooks(self, ctx):
+        playbooks_path = os.path.join('deployment', 'playbooks')
+        playbooks = []
+        for item in sorted(os.listdir(playbooks_path)):
+            if not item.endswith('.yml'):
+                continue
+            item = item[:-4]
+            if item == 'site':
+                item = 'site (default)'
+            playbooks.append(item)
 
-    click.echo("Environments:")
-    for item in sorted(os.listdir(environments_path)):
-        click.echo("  {}".format(item))
+        return playbooks
 
-    click.echo('')
-    click.echo("Playbooks:")
-    for item in sorted(os.listdir(playbooks_path)):
-        if not item.endswith('.yml'):
-            continue
-        item = item[:-4]
-        if item == 'site':
-            item = 'site (default)'
-        click.echo("  {}".format(item))
+    def format_environments(self, ctx, formatter):
+        envs = [(env, '') for env in self.get_environments(ctx)]
+        if envs:
+            with formatter.section('Environments'):
+                formatter.write_dl(envs)
 
-    ctx.exit()
+    def format_playbooks(self, ctx, formatter):
+        playbooks = [(playbook, '') for playbook in self.get_playbooks(ctx)]
+        if playbooks:
+            with formatter.section('Playbooks'):
+                formatter.write_dl(playbooks)
+
+    def format_help(self, ctx, formatter):
+        """Writes the help into the formatter if it exists.
+        This calls into the following methods:
+        -   :meth:`format_usage`
+        -   :meth:`format_help_text`
+        -   :meth:`format_environments`
+        -   :meth:`format_playbooks`
+        -   :meth:`format_options`
+        -   :meth:`format_epilog`
+        """
+        self.format_usage(ctx, formatter)
+        self.format_help_text(ctx, formatter)
+        self.format_environments(ctx, formatter)
+        self.format_playbooks(ctx, formatter)
+        self.format_options(ctx, formatter)
+        self.format_epilog(ctx, formatter)
 
 
-@cli.command(context_settings=CONTEXT_SETTINGS,
+@cli.command(cls=PlayCommand,
+             context_settings=CONTEXT_SETTINGS,
              short_help="Run a playbook for a given environment.")
-@click.option('--list', '-l', is_flag=True, callback=print_envs_playbooks,
-              expose_value=False, is_eager=True)
 @click.argument('environment')
 @click.argument('playbook', default='site')
 def play(environment, playbook):
