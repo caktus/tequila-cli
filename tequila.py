@@ -6,12 +6,16 @@ from ansible.parsing.vault import VaultLib
 import click
 
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
 @click.group()
 def cli():
     pass
 
 
-@cli.command(short_help="Run a playbook for a given environment.")
+@cli.command(context_settings=CONTEXT_SETTINGS,
+             short_help="Run a playbook for a given environment.")
 @click.argument('environment')
 @click.argument('playbook', default='site')
 def play(environment, playbook):
@@ -24,7 +28,8 @@ def play(environment, playbook):
     subprocess.call(['ansible-playbook', '-i', inventory, playbook_path])
 
 
-@cli.command(short_help="Install the Ansible roles in the requirements file.")
+@cli.command(context_settings=CONTEXT_SETTINGS,
+             short_help="Install the Ansible roles in the requirements file.")
 def install_roles():
     requirements_path = os.path.join('deployment', 'requirements.yml')
     subprocess.call(['ansible-galaxy', 'install', '-i', '-r', requirements_path])
@@ -43,7 +48,8 @@ def read_git(ref, secrets_path):
     return ciphertext
 
 
-@cli.command(short_help="Examine the secrets for an environment.")
+@cli.command(context_settings=CONTEXT_SETTINGS,
+             short_help="Examine the secrets for an environment.")
 @click.argument('environment')
 @click.argument('ref', default='.')
 @click.option('--diff', metavar='REF', help="Git reference to compare against")
