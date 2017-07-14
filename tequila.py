@@ -1,3 +1,4 @@
+import difflib
 import os.path
 import subprocess
 
@@ -29,9 +30,24 @@ def install_roles():
     subprocess.call(['ansible-galaxy', 'install', '-i', '-r', requirements_path])
 
 
+def read_git(ref, secrets_path):
+    if ref == '.':
+        # This is a placeholder for the working tree, read from the concrete file
+        with open(secrets_path, 'rb') as f:
+            ciphertext = f.read()
+    else:
+        # Read from a file at the point in the history specified by 'ref'
+        path_spec = ':'.join((ref, secrets_path))
+        ciphertext = subprocess.check_output(['git', 'show', path_spec])
+
+    return ciphertext
+
+
 @cli.command(short_help="Examine the secrets for an environment.")
 @click.argument('environment')
-def secrets(environment):
+@click.argument('ref', default='.')
+@click.option('--diff', metavar='REF', help="Git reference to compare against")
+def secrets(environment, ref, diff):
     environment_path = os.path.join('deployment', 'environments', environment)
     secrets_path = os.path.join(environment_path, 'group_vars', 'all', 'secrets.yml')
 
@@ -40,28 +56,19 @@ def secrets(environment):
 
     vault = VaultLib(password)
 
-    ## Read from a concrete file:
+    secrets = [read_git(ref, secrets_path)]
+    if diff is not None:
+        secrets.append(read_git(diff, secrets_path))
 
-    with open(secrets_path, 'rb') as f:
-        ciphertext = f.read()
+    # Decrypt the ciphertext
+    plaintext = [vault.decrypt(x).decode('utf-8') for x in secrets]
 
-    ## Read from a file in the git history
-
-    # path_spec = ':'.join((revision, secrets_path))
-    # try:
-    #     ciphertext = subprocess.check_output(['git', 'show', path_spec])
-    # except Exception as e:
-    #     raise
-
-    ## Decrypt the ciphertext
-
-    try:
-        plaintext = vault.decrypt(ciphertext)
-    except Exception as e:
-        raise  # FIXME
-
-    click.echo(plaintext)
-
-    ## Alternate decryption
-
-    # subprocess.call(['ansible-vault', 'decrypt', '-'])
+    if diff is None:
+        click.echo(plaintext[0])
+    else:
+        click.echo(
+            ''.join(difflib.unified_diff(plaintext[1].splitlines(True),
+                                         plaintext[0].splitlines(True),
+                                         fromfile=':'.join((diff, secrets_path)),
+                                         tofile=':'.join((ref, secrets_path))))
+        )
