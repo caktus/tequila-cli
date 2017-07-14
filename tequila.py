@@ -1,4 +1,5 @@
 import difflib
+import os
 import os.path
 import subprocess
 
@@ -14,8 +15,34 @@ def cli():
     pass
 
 
+def print_envs_playbooks(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+
+    environments_path = os.path.join('deployment', 'environments')
+    playbooks_path = os.path.join('deployment', 'playbooks')
+
+    click.echo("Environments:")
+    for item in sorted(os.listdir(environments_path)):
+        click.echo("  {}".format(item))
+
+    click.echo('')
+    click.echo("Playbooks:")
+    for item in sorted(os.listdir(playbooks_path)):
+        if not item.endswith('.yml'):
+            continue
+        item = item[:-4]
+        if item == 'site':
+            item = 'site (default)'
+        click.echo("  {}".format(item))
+
+    ctx.exit()
+
+
 @cli.command(context_settings=CONTEXT_SETTINGS,
              short_help="Run a playbook for a given environment.")
+@click.option('--list', '-l', is_flag=True, callback=print_envs_playbooks,
+              expose_value=False, is_eager=True)
 @click.argument('environment')
 @click.argument('playbook', default='site')
 def play(environment, playbook):
