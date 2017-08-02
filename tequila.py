@@ -68,14 +68,24 @@ class PlayCommand(click.Command):
              short_help="Run a playbook for a given environment.")
 @click.argument('environment')
 @click.argument('playbook', default='site')
-def play(environment, playbook):
+@click.option('--user', '-u', metavar='REMOTE_USER',
+              help="connect as this user (default=None)")
+@click.option('--private-key', '--key-file', metavar='PRIVATE_KEY_FILE',
+              help="use this file to authenticate the connection")
+def play(environment, playbook, user, key_file):
     if not playbook.endswith('.yml'):
         playbook = '{}.yml'.format(playbook)
     playbook_path = os.path.join('deployment', 'playbooks', playbook)
     environment_path = os.path.join('deployment', 'environments', environment)
     inventory = os.path.join(environment_path, 'inventory')
 
-    subprocess.call(['ansible-playbook', '-i', inventory, playbook_path])
+    command = ['ansible-playbook', '-i', inventory, playbook_path]
+    if user:
+        command.extend(('--user', user))
+    if key_file:
+        command.extend(('--private-key', key_file))
+
+    subprocess.call(command)
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS,
