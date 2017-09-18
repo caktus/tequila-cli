@@ -70,9 +70,15 @@ class PlayCommand(click.Command):
 @click.argument('playbook', default='site')
 @click.option('--user', '-u', metavar='REMOTE_USER',
               help="connect as this user (default=None)")
+@click.option('--ask-pass', '-k', flag_value='ask_pass', default=False,
+              help=(
+                  "Prompt for the connection password, if it is needed for the"
+                  "transport used. For example, using ssh and not having a key-based"
+                  "authentication with ssh-agent."
+              ))
 @click.option('--private-key', '--key-file', metavar='PRIVATE_KEY_FILE',
               help="use this file to authenticate the connection")
-def play(environment, playbook, user, key_file):
+def play(environment, playbook, user, ask_pass, key_file):
     if not playbook.endswith('.yml'):
         playbook = '{}.yml'.format(playbook)
     playbook_path = os.path.join('deployment', 'playbooks', playbook)
@@ -82,6 +88,8 @@ def play(environment, playbook, user, key_file):
     command = ['ansible-playbook', '-i', inventory, playbook_path]
     if user:
         command.extend(('--user', user))
+    if ask_pass:
+        command.append('--ask-pass')
     if key_file:
         command.extend(('--private-key', key_file))
 
