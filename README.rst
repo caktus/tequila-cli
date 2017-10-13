@@ -30,7 +30,7 @@ your local machine and pip install it ::
 
     $ pip install ansible click
 
-    $ git clone git+git@github.com:caktus/tequila-cli.git
+    $ git clone git@github.com:caktus/tequila-cli.git
 
     $ pip install -e tequila-cli/
 
