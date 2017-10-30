@@ -23,16 +23,18 @@ with either Python 2.7 or Python 3.
 Installing
 ~~~~~~~~~~
 
-For development purposes, create a virtualenv and clone the repo to
+For development purposes, create a virtualenv, then clone the repo to
 your local machine and pip install it ::
 
     $ mkvirtualenv tequila -p $(which python3)
 
-    $ pip install ansible click
+    (tequila)$ pip install ansible click
 
-    $ git clone git@github.com:caktus/tequila-cli.git
+    (tequila)$ git clone git@github.com:caktus/tequila-cli.git
 
-    $ pip install -e tequila-cli/
+    (tequila)$ cd tequila-cli/
+
+    (tequila)$ pip install -e .
 
 
 Usage
@@ -40,7 +42,7 @@ Usage
 
 To get the main help page, run with the ``--help`` flag ::
 
-    $ tequila --help
+    (tequila)$ tequila --help
     Usage: tequila [OPTIONS] COMMAND [ARGS]...
 
     Options:
@@ -62,7 +64,7 @@ e.g. ``roles_path = deployment/roles/``.
 
 This subcommand takes no other options, other than the help flag ::
 
-    $ tequila install_roles --help
+    (tequila)$ tequila install_roles --help
     Usage: tequila install_roles [OPTIONS]
 
     Options:
@@ -79,7 +81,7 @@ can be deployed to, and the playbooks that can be used, as long as
 they are in the conventional locations (deployment/environments/ and
 deployment/playbooks/, respectively) ::
 
-    $ tequila play --help
+    (tequila)$ tequila play --help
     Usage: tequila play [OPTIONS] ENVIRONMENT [PLAYBOOK]
 
     Environments:
@@ -114,7 +116,7 @@ The ``secrets`` subcommand can be used to examine your project's
 encrypted secrets files in-place, without overwriting the files with
 the decrypted version ::
 
-    $ tequila secrets --help
+    (tequila)$ tequila secrets --help
     Usage: tequila secrets [OPTIONS] ENVIRONMENT [REF]
 
     Options:
@@ -124,13 +126,13 @@ the decrypted version ::
 So, in order to see the current working version of the secrets for the
 staging environment, you would do ::
 
-    $ tequila secrets staging
+    (tequila)$ tequila secrets staging
 
 and it will display the plaintext of the secrets on stdout.  One can
 also see the decrypted secrets from some other git reference, such as
 a different branch, without explicitly checking it out ::
 
-    $ tequila secrets staging feature-branch
+    (tequila)$ tequila secrets staging feature-branch
 
 Finally, it is possible to compare the decrypted versions of two
 different git references (or a git reference against the current
@@ -138,7 +140,7 @@ working version).  This is useful for comparing a re-encrypted changed
 working copy of the secrets against the last committed version, like
 so ::
 
-    $ tequila secrets staging --diff HEAD
+    (tequila)$ tequila secrets staging --diff HEAD
 
 A git-style unified diff of the secrets will be displayed to stdout.
 
