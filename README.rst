@@ -4,6 +4,9 @@ tequila-cli
 Tequila-cli is a command-line tool that (mostly) wraps Ansible,
 providing for some less verbose deployment workflows.
 
+More complete documenation can be found in `caktus/tequila
+<https://github.com/caktus/tequila>`_.
+
 
 Getting Started
 ---------------
@@ -20,21 +23,39 @@ in order to make use of the tequila-cli tool.  Tequila-cli will work
 with either Python 2.7 or Python 3.
 
 
-Installing
-~~~~~~~~~~
+Setup
+~~~~~
 
-For development purposes, create a virtualenv, then clone the repo to
-your local machine and pip install it ::
+First clone the repo to your local machine, then create a virtualenv
+and pip install it ::
+
+    $ git clone git@github.com:caktus/tequila-cli.git
+
+    $ cd tequila-cli/
 
     $ mkvirtualenv tequila -p $(which python3)
 
     (tequila)$ pip install ansible click
 
-    (tequila)$ git clone git@github.com:caktus/tequila-cli.git
-
-    (tequila)$ cd tequila-cli/
-
     (tequila)$ pip install -e .
+
+Once tequila-cli is installed, the ``tequila`` script will be
+available in your virtualenv's path and any changes you make should be
+immediately active ::
+
+    (tequila)$ tequila --help
+    Usage: tequila [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      install_roles  Install the Ansible roles in the requirements file.
+      play           Run a playbook for a given environment.
+      secrets        Examine the secrets for an environment.
+
+
+Tequila-cli can be used with either Python 2.7 or 3.
 
 
 Usage
