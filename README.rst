@@ -4,6 +4,9 @@ tequila-cli
 Tequila-cli is a command-line tool that (mostly) wraps Ansible,
 providing for some less verbose deployment workflows.
 
+More complete documenation can be found in `caktus/tequila
+<https://github.com/caktus/tequila>`_.
+
 
 Getting Started
 ---------------
@@ -20,19 +23,39 @@ in order to make use of the tequila-cli tool.  Tequila-cli will work
 with either Python 2.7 or Python 3.
 
 
-Installing
-~~~~~~~~~~
+Setup
+~~~~~
 
-For development purposes, create a virtualenv and clone the repo to
-your local machine and pip install it ::
-
-    $ mkvirtualenv tequila -p $(which python3)
-
-    $ pip install ansible click
+First clone the repo to your local machine, then create a virtualenv
+and pip install it ::
 
     $ git clone git@github.com:caktus/tequila-cli.git
 
-    $ pip install -e tequila-cli/
+    $ cd tequila-cli/
+
+    $ mkvirtualenv tequila -p $(which python3)
+
+    (tequila)$ pip install ansible click
+
+    (tequila)$ pip install -e .
+
+Once tequila-cli is installed, the ``tequila`` script will be
+available in your virtualenv's path and any changes you make should be
+immediately active ::
+
+    (tequila)$ tequila --help
+    Usage: tequila [OPTIONS] COMMAND [ARGS]...
+
+    Options:
+      --help  Show this message and exit.
+
+    Commands:
+      install_roles  Install the Ansible roles in the requirements file.
+      play           Run a playbook for a given environment.
+      secrets        Examine the secrets for an environment.
+
+
+Tequila-cli can be used with either Python 2.7 or 3.
 
 
 Usage
@@ -40,7 +63,7 @@ Usage
 
 To get the main help page, run with the ``--help`` flag ::
 
-    $ tequila --help
+    (tequila)$ tequila --help
     Usage: tequila [OPTIONS] COMMAND [ARGS]...
 
     Options:
@@ -62,7 +85,7 @@ e.g. ``roles_path = deployment/roles/``.
 
 This subcommand takes no other options, other than the help flag ::
 
-    $ tequila install_roles --help
+    (tequila)$ tequila install_roles --help
     Usage: tequila install_roles [OPTIONS]
 
     Options:
@@ -79,7 +102,7 @@ can be deployed to, and the playbooks that can be used, as long as
 they are in the conventional locations (deployment/environments/ and
 deployment/playbooks/, respectively) ::
 
-    $ tequila play --help
+    (tequila)$ tequila play --help
     Usage: tequila play [OPTIONS] ENVIRONMENT [PLAYBOOK]
 
     Environments:
@@ -114,7 +137,7 @@ The ``secrets`` subcommand can be used to examine your project's
 encrypted secrets files in-place, without overwriting the files with
 the decrypted version ::
 
-    $ tequila secrets --help
+    (tequila)$ tequila secrets --help
     Usage: tequila secrets [OPTIONS] ENVIRONMENT [REF]
 
     Options:
@@ -124,13 +147,13 @@ the decrypted version ::
 So, in order to see the current working version of the secrets for the
 staging environment, you would do ::
 
-    $ tequila secrets staging
+    (tequila)$ tequila secrets staging
 
 and it will display the plaintext of the secrets on stdout.  One can
 also see the decrypted secrets from some other git reference, such as
 a different branch, without explicitly checking it out ::
 
-    $ tequila secrets staging feature-branch
+    (tequila)$ tequila secrets staging feature-branch
 
 Finally, it is possible to compare the decrypted versions of two
 different git references (or a git reference against the current
@@ -138,7 +161,7 @@ working version).  This is useful for comparing a re-encrypted changed
 working copy of the secrets against the last committed version, like
 so ::
 
-    $ tequila secrets staging --diff HEAD
+    (tequila)$ tequila secrets staging --diff HEAD
 
 A git-style unified diff of the secrets will be displayed to stdout.
 
