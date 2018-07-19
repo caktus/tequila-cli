@@ -2,6 +2,7 @@ import difflib
 import os
 import os.path
 import subprocess
+import sys
 
 from ansible.parsing.vault import VaultLib
 import click
@@ -93,14 +94,14 @@ def play(environment, playbook, user, ask_pass, key_file):
     if key_file:
         command.extend(('--private-key', key_file))
 
-    subprocess.call(command)
+    sys.exit(subprocess.call(command))
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS,
              short_help="Install the Ansible roles in the requirements file.")
 def install_roles():
     requirements_path = os.path.join('deployment', 'requirements.yml')
-    subprocess.call(['ansible-galaxy', 'install', '-i', '-r', requirements_path])
+    sys.exit(subprocess.call(['ansible-galaxy', 'install', '-i', '-r', requirements_path]))
 
 
 def read_git(ref, secrets_path):
